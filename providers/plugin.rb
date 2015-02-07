@@ -18,7 +18,7 @@
 #
 
 def plugins_bin_path(return_array=false)
-  path = ENV.fetch('PATH') + ':/usr/lib/rabbitmq/bin'
+  path = '/usr/lib/rabbitmq/bin:' + ENV.fetch('PATH') 
   return_array ? path.split(':') : path
 end
 
@@ -38,8 +38,8 @@ action :enable do
   unless plugin_enabled?(new_resource.plugin)
     execute "rabbitmq-plugins enable #{new_resource.plugin}" do
       Chef::Log.info "Enabling RabbitMQ plugin '#{new_resource.plugin}'."
-      path plugins_bin_path(true)
       new_resource.updated_by_last_action(true)
+      environment ({'PATH' => plugins_bin_path()})
     end
   end
 end
@@ -48,8 +48,8 @@ action :disable do
   if plugin_enabled?(new_resource.plugin)
     execute "rabbitmq-plugins disable #{new_resource.plugin}" do
       Chef::Log.info "Disabling RabbitMQ plugin '#{new_resource.plugin}'."
-      path plugins_bin_path(true)
       new_resource.updated_by_last_action(true)
+      environment ({'PATH' => plugins_bin_path()})
     end
   end
 end
